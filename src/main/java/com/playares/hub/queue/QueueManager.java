@@ -49,4 +49,21 @@ public final class QueueManager {
         customItemService.registerNewItem(new ServerSelectorItem(plugin));
         customItemService.registerNewItem(new LeaveQueueItem(plugin));
     }
+
+    /**
+     * Returns the current queue for the provided Bukkit Player
+     * @param player Bukkit Player
+     * @return ServerQueue
+     */
+    public ServerQueue getCurrentQueue(Player player) {
+        for (ServerQueue queue : serverQueues.values()) {
+            for (ServerQueue.QueuedPlayer queuedPlayer : queue.getQueue()) {
+                if (queuedPlayer.getUniqueId().equals(player.getUniqueId())) {
+                    return queue;
+                }
+            }
+        }
+
+        return null;
+    }
 }
