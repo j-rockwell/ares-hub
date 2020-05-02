@@ -67,10 +67,7 @@ public final class SelectorMenu extends Menu {
             lore.add(ChatColor.RESET + " ");
             lore.add(ChatColor.GOLD + "Status" + ChatColor.YELLOW + ": " + civ.getStatus().getDisplayName());
             lore.add(ChatColor.GOLD + "Online" + ChatColor.YELLOW + ": " + ChatColor.GRAY + civ.getPlayerList().size());
-
-            if (queue != null) {
-                lore.add(ChatColor.GOLD + "Queue" + ChatColor.YELLOW + ": " + ChatColor.GRAY + queue.getQueue().size());
-            }
+            lore.add(ChatColor.GOLD + "Queue" + ChatColor.YELLOW + ": " + ChatColor.GRAY + (queue != null ? queue.getQueue().size() : 0));
 
             lore.add(ChatColor.RESET + " ");
             lore.add(ChatColor.GREEN + "Click to join!");
@@ -91,6 +88,12 @@ public final class SelectorMenu extends Menu {
                 }
 
                 final ServerQueue finalizedQueue = hub.getQueueManager().getServerQueues().get(civ);
+                final ServerQueue currentQueue = hub.getQueueManager().getCurrentQueue(player);
+
+                if (currentQueue != null) {
+                    currentQueue.remove(player.getUniqueId());
+                }
+
                 finalizedQueue.add(player.getUniqueId(), rank);
 
                 player.sendMessage(ChatColor.RESET + "Adding you to the " + civ.getDisplayName() + ChatColor.RESET + " queue...");
