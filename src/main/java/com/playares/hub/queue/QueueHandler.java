@@ -25,7 +25,7 @@ public final class QueueHandler {
                 continue;
             }
 
-            final ServerQueue.QueuedPlayer processed = queue.getQueue().get(0);
+            final ServerQueue.QueuedPlayer processed = queue.getSortedQueue().get(0);
             final Player player = Bukkit.getPlayer(processed.getUniqueId());
 
             if (player == null) {
