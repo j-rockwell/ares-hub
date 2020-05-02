@@ -17,6 +17,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.util.Vector;
 
@@ -111,5 +112,11 @@ public final class HubListener implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         checkPermissions(event.getPlayer(), event);
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        final Player player = (Player)event.getWhoClicked();
+        checkPermissions(player, event);
     }
 }
