@@ -60,5 +60,6 @@ public final class Hub extends AresPlugin {
     @Override
     public void onDisable() {
         super.onDisable();
+        stopServices();
     }
 }
