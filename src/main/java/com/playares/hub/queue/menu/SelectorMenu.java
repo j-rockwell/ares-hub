@@ -52,7 +52,12 @@ public final class SelectorMenu extends Menu {
         final SyncedServer civ = syncService.getServers().stream().filter(server -> server.getType().equals(SyncedServer.ServerType.CIV)).findFirst().orElse(null);
 
         if (civ != null) {
-            final ServerQueue queue = hub.getQueueManager().getServerQueues().get(civ);
+            ServerQueue queue = hub.getQueueManager().getServerQueues().get(civ.getServerId());
+
+            if (queue == null) {
+                queue = new ServerQueue(civ);
+                hub.getQueueManager().getServerQueues().put(civ.getServerId(), queue);
+            }
 
             final ItemBuilder builder = new ItemBuilder()
                     .setMaterial(Material.DIAMOND_HELMET)
@@ -67,12 +72,14 @@ public final class SelectorMenu extends Menu {
             lore.add(ChatColor.RESET + " ");
             lore.add(ChatColor.GOLD + "Status" + ChatColor.YELLOW + ": " + civ.getStatus().getDisplayName());
             lore.add(ChatColor.GOLD + "Online" + ChatColor.YELLOW + ": " + ChatColor.GRAY + civ.getPlayerList().size());
-            lore.add(ChatColor.GOLD + "Queue" + ChatColor.YELLOW + ": " + ChatColor.GRAY + (queue != null ? queue.getQueue().size() : 0));
+            lore.add(ChatColor.GOLD + "Queue" + ChatColor.YELLOW + ": " + ChatColor.GRAY + queue.getQueue().size());
 
             lore.add(ChatColor.RESET + " ");
             lore.add(ChatColor.GREEN + "Click to join!");
 
             builder.addLore(lore);
+
+            final ServerQueue finalizedQueue = queue;
 
             addItem(new ClickableItem(builder.build(), 0, click -> {
                 final LuxeService luxe = (LuxeService)hub.getService(LuxeService.class);
@@ -83,11 +90,7 @@ public final class SelectorMenu extends Menu {
                     rank = luxe.getRankManager().getHighestRank(player);
                 }
 
-                if (!hub.getQueueManager().getServerQueues().containsKey(civ)) {
-                    hub.getQueueManager().getServerQueues().put(civ, new ServerQueue(civ));
-                }
 
-                final ServerQueue finalizedQueue = hub.getQueueManager().getServerQueues().get(civ);
                 final ServerQueue currentQueue = hub.getQueueManager().getCurrentQueue(player);
 
                 if (currentQueue != null) {

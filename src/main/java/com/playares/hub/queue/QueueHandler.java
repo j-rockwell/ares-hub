@@ -18,8 +18,8 @@ public final class QueueHandler {
     }
 
     public void processQueues() {
-        for (SyncedServer server : manager.getServerQueues().keySet()) {
-            final ServerQueue queue = getManager().getServerQueues().get(server);
+        for (SyncedServer server : manager.getQueueSnapshot().keySet()) {
+            final ServerQueue queue = getManager().getServerQueues().get(server.getServerId());
 
             if (queue.getQueue().isEmpty()) {
                 continue;

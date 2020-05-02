@@ -23,7 +23,12 @@ public final class QueueListener implements Listener {
     @EventHandler
     public void onServerSync(ServerSyncEvent event) {
         for (SyncedServer updated : event.getServers()) {
-            final SyncedServer server = manager.getServerQueues().keySet().stream().filter(s -> s.getServerId() == updated.getServerId() && s.getType().equals(updated.getType())).findFirst().orElse(null);
+            final SyncedServer server = manager.getQueueSnapshot()
+                    .keySet()
+                    .stream()
+                    .filter(s -> s.getServerId() == updated.getServerId())
+                    .findFirst()
+                    .orElse(null);
 
             if (server != null) {
                 server.setDisplayName(updated.getDisplayName());
@@ -33,7 +38,7 @@ public final class QueueListener implements Listener {
                 continue;
             }
 
-            manager.getServerQueues().put(updated, new ServerQueue(updated));
+            manager.getServerQueues().put(updated.getServerId(), new ServerQueue(updated));
         }
     }
 

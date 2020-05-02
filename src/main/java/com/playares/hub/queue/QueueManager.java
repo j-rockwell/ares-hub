@@ -1,8 +1,10 @@
 package com.playares.hub.queue;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.playares.commons.logger.Logger;
 import com.playares.commons.services.customitems.CustomItemService;
+import com.playares.commons.services.serversync.ServerSyncService;
 import com.playares.commons.services.serversync.data.SyncedServer;
 import com.playares.commons.util.bukkit.Scheduler;
 import com.playares.hub.Hub;
@@ -21,7 +23,7 @@ import java.util.Map;
 public final class QueueManager {
     @Getter public final Hub plugin;
     @Getter public final QueueHandler handler;
-    @Getter public final Map<SyncedServer, ServerQueue> serverQueues;
+    @Getter public final Map<Integer, ServerQueue> serverQueues;
     @Getter public BukkitTask queueProcessor;
     @Getter public BukkitTask queueNotifier;
 
@@ -48,6 +50,28 @@ public final class QueueManager {
 
         customItemService.registerNewItem(new ServerSelectorItem(plugin));
         customItemService.registerNewItem(new LeaveQueueItem(plugin));
+    }
+
+    /**
+     * Returns a snapshot of the queue with synced servers
+     * @return Immutable Map of Synced Servers and their respected Server Queues
+     */
+    public ImmutableMap<SyncedServer, ServerQueue> getQueueSnapshot() {
+        final ServerSyncService syncService = (ServerSyncService)plugin.getService(ServerSyncService.class);
+        final Map<SyncedServer, ServerQueue> result = Maps.newHashMap();
+
+        if (syncService == null) {
+            Logger.error("Failed to obtain Server Sync Service while obtaining a Queue Snapshot");
+            return ImmutableMap.of();
+        }
+
+        serverQueues.forEach((id, serverQueue) -> syncService.getServers()
+                        .stream()
+                        .filter(s -> s.getServerId() == id)
+                        .findFirst()
+                        .ifPresent(server -> result.put(server, serverQueue)));
+
+        return ImmutableMap.copyOf(result);
     }
 
     /**
