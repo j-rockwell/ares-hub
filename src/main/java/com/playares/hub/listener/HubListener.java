@@ -3,6 +3,12 @@ package com.playares.hub.listener;
 import com.playares.commons.event.PlayerBigMoveEvent;
 import com.playares.commons.event.PlayerDamagePlayerEvent;
 import com.playares.commons.util.bukkit.Players;
+import com.playares.essentials.EssentialsService;
+import com.playares.hub.Hub;
+import com.playares.luxe.LuxeService;
+import com.playares.luxe.rank.data.Rank;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Material;
@@ -19,15 +25,48 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
+@AllArgsConstructor
 public final class HubListener implements Listener {
+    @Getter public final Hub plugin;
+
     private void checkPermissions(Player player, Cancellable event) {
         if (player.hasPermission("areshub.edit")) {
             return;
         }
 
         event.setCancelled(true);
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        final EssentialsService essentialsService = (EssentialsService)plugin.getService(EssentialsService.class);
+        final LuxeService luxeService = (LuxeService)plugin.getService(LuxeService.class);
+
+        if (luxeService == null || essentialsService == null) {
+            event.setJoinMessage(null);
+            return;
+        }
+
+        final Player player = event.getPlayer();
+        final Rank rank = luxeService.getRankManager().getHighestRank(player);
+
+        if (rank == null) {
+            event.setJoinMessage(null);
+            return;
+        }
+
+        if (!essentialsService.getVanishManager().isVanished(player)) {
+            event.setJoinMessage(luxeService.getRankManager().formatName(player) + ChatColor.YELLOW + " joined the lobby");
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        event.setQuitMessage(null);
     }
 
     @EventHandler

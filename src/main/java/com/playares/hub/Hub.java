@@ -36,7 +36,7 @@ public final class Hub extends AresPlugin {
         registerCommandManager(new PaperCommandManager(this));
         registerProtocolLibrary(ProtocolLibrary.getProtocolManager());
 
-        registerListener(new HubListener());
+        registerListener(new HubListener(this));
 
         // Services
         registerService(new CustomEventService(this));
