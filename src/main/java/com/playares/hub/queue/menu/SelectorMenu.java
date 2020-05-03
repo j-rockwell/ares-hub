@@ -90,7 +90,6 @@ public final class SelectorMenu extends Menu {
                     rank = luxe.getRankManager().getHighestRank(player);
                 }
 
-
                 final ServerQueue currentQueue = hub.getQueueManager().getCurrentQueue(player);
 
                 if (currentQueue != null) {
